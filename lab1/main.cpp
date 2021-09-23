@@ -41,10 +41,96 @@ union DataInternal
 		}
 };
 
+template <typename T1 = char>
+class Interface { // нужно доделать
+private:
+	Interface();
 
+public:
+	static void Reference(){
+		cout << "1 - To get binary representation for type float" << endl;
+		cout << "2 - To get binary representation for type short" << endl;
+		cout << "3 - To exit" << endl;
+		cout << "Enter your choice: ";
+	};
+
+	static void GF() {
+		T1 toInvert = InputNumber();
+		DataInternal<T1>* dat = new DataInternal<T1>(toInvert);
+		cout << dat->GetData() << " in binary representation - " << dat->GetBinary() << endl;
+
+		int* invertedNumbers = InputInvertedNumbers();
+		dat->InvertSelected(invertedNumbers, toInvert);
+		cout << dat->GetData() << " " << dat->GetBinary() << endl;
+
+		delete dat;
+		delete invertedNumbers;
+	}
+
+	static T1 InputNumber() {
+		T1 n;
+		bool flag = 0;
+		while (!flag) {
+			cout << "Enter number: ";
+			cin >> n;
+			if (cin.get() != '\n') {
+				cin.clear();
+				cout << "Invalid input!" << endl;
+			}
+			else flag = 1;
+		}
+		system("cls");
+		return n;
+	}
+
+	static int* InputInvertedNumbers() {
+		int n;
+		bool flag = 0;
+		while (!flag) {
+			cout << "Enter count of bits you want to invert: ";
+			cin >> n;
+			if (n > (sizeof(T1) * 8) || cin.get() != '\n') {
+				cin.clear();
+				cout << "Invalid input" << endl;
+			}
+			else flag = 1;
+		}
+
+		int* A = new int[n];
+		for (int i = 0; i < n; i++) {
+			bool flag = 0;
+			while (!flag) {
+				cout << "Enter index of bit you want to invert: ";
+				cin >> A[i];
+				if (A[i] > (sizeof(T1) * 8) || cin.get() != '\n') {
+					cin.clear();
+					cout << "Invalid input!" << endl;
+				}
+				else flag = 1;
+			}
+		} 
+
+		system("cls");
+
+		return A;
+	}
+	
+};
 
 int main()
 {
+	int button = 0;
+	while (button != 3) {
+		Interface<>::Reference();
+		cin >> button;
+		cin.clear();
+		system("cls");
+
+		if (button == 1) Interface<float>::GF();
+		else if (button == 2) Interface<short>::GF();
+	}
+
+	/*
 	DataInternal<float> *dat = new DataInternal<float>(-34535.2545633); // Для теста: ввести в <> имя типа, значение в конструктор
 	int toInvert;
 	int* invertedNumbers;
@@ -60,5 +146,6 @@ int main()
 	cout << dat->GetData() << " " << dat->GetBinary() << endl;
 
 	delete dat;
+	*/
 	return 0;
 }
