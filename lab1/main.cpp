@@ -14,6 +14,9 @@ union DataInternal
 		DataInternal() : data((T)0) {};
 		T GetData() { return data; }
 
+
+		void SetData(T _data) { data = _data;};
+
 		char* GetBinary(char* out = nullptr)
 		{
 			int tSize = sizeof(T);
@@ -41,111 +44,137 @@ union DataInternal
 		}
 };
 
-template <typename T1 = char>
-class Interface { // нужно доделать
+class Interface {
 private:
-	Interface();
+	Interface() {};
 
 public:
-	static void Reference(){
-		cout << "1 - To get binary representation for type float" << endl;
-		cout << "2 - To get binary representation for type short" << endl;
-		cout << "3 - To exit" << endl;
+	static void Help(){
+		cout << "1 - To input a number" << endl;
+		cout << "2 - For output" << endl;
+		cout << "3 - To invert all but selected" << endl;
+		cout << "4 - Exit" << endl;
 		cout << "Enter your choice: ";
 	};
 
-	static void GF() {
-		T1 toInvert = InputNumber();
-		DataInternal<T1>* dat = new DataInternal<T1>(toInvert);
-		cout << dat->GetData() << " in binary representation - " << dat->GetBinary() << endl;
-
-		int* invertedNumbers = InputInvertedNumbers();
-		dat->InvertSelected(invertedNumbers, toInvert);
-		cout << dat->GetData() << " " << dat->GetBinary() << endl;
-
-		delete dat;
-		delete invertedNumbers;
-	}
-
-	static T1 InputNumber() {
-		T1 n;
+	template <typename T = char>
+	static T InputNumber() {
+		T data;
 		bool flag = 0;
 		while (!flag) {
-			cout << "Enter number: ";
-			cin >> n;
+			cin >> data;
 			if (cin.get() != '\n') {
 				cin.clear();
-				cout << "Invalid input!" << endl;
+				for (; cin.get() != '\n';);
+				cout << "Enter correct number!" << endl;
 			}
 			else flag = 1;
 		}
-		system("cls");
-		return n;
+		
+		return data;
 	}
 
-	static int* InputInvertedNumbers() {
-		int n;
-		bool flag = 0;
-		while (!flag) {
-			cout << "Enter count of bits you want to invert: ";
-			cin >> n;
-			if (n > (sizeof(T1) * 8) || cin.get() != '\n') {
-				cin.clear();
-				cout << "Invalid input" << endl;
-			}
-			else flag = 1;
+	static void InputUnion(DataInternal<float>** floatVar, DataInternal<short>** shortVar, int* processed)
+	{
+		cout << "1 - For float input" << endl
+			<< "2 - For short input" << endl
+			<< "Enter your choice: ";
+		do 
+			*processed = InputNumber<int>();
+		while (*processed != 1 && *processed != 2);
+		if (*processed == 1) {
+			if (*floatVar)
+				(*floatVar)->SetData(InputNumber<float>());
+			else (*floatVar) = new DataInternal<float>(InputNumber<float>());
 		}
-
-		int* A = new int[n];
-		for (int i = 0; i < n; i++) {
-			bool flag = 0;
-			while (!flag) {
-				cout << "Enter index of bit you want to invert: ";
-				cin >> A[i];
-				if (A[i] > (sizeof(T1) * 8) || cin.get() != '\n') {
-					cin.clear();
-					cout << "Invalid input!" << endl;
-				}
-				else flag = 1;
-			}
-		} 
-
-		system("cls");
-
-		return A;
+		else {
+			if (*shortVar)
+				(*shortVar)->SetData(InputNumber<short>());
+			else (*shortVar) = new DataInternal<short>(InputNumber<short>());
+		}
+		
 	}
-	
+
+	static void OutputUnion(DataInternal<float>** floatVar, DataInternal<short>** shortVar, int* processed)
+	{
+		char* address = nullptr;
+
+		if (*processed == 1)
+		{
+			cout << "Representation: " << (*floatVar)->GetBinary(address) << endl
+			<< "Number: " << (*floatVar)->GetData() << endl;
+		}
+		else if (*processed == 2)
+		{
+			cout << "Representation: " << (*shortVar)->GetBinary(address) << endl
+			<< "Number: " << (*shortVar)->GetData() << endl;
+		}
+		else cout << "Not initialized" << endl;
+
+		delete address;
+	}
+
+	static void Invert(DataInternal<float>** floatVar, DataInternal<short>** shortVar, int* processed) {
+		int size;
+		int* toInvert;
+
+		if (*processed == 1)
+		{
+			cout << "How many to invert? " << endl;
+			size = InputNumber<int>();
+			toInvert = new int[size];
+			for (int i = 0; i < size; i++) {
+				int tmp;
+				do {
+					cout << "Enter the number of bit: ";
+					tmp = InputNumber<int>();
+				} while ((tmp > 31) || (tmp < 0));
+				toInvert[i] = tmp;
+			}
+
+			(*floatVar)->InvertSelected(toInvert, size);
+		}
+		else if (*processed == 2)
+		{
+			cout << "How many to invert? ";
+
+			size = InputNumber<int>();
+			toInvert = new int[size];
+			for (int i = 0; i < size; i++) {
+				int tmp;
+				do {
+					cout << "Enter the number of bit: ";
+					tmp = InputNumber<int>();
+				} while ((tmp > 15) || (tmp < 0));
+				toInvert[i] = tmp;
+			}
+
+			(*shortVar)->InvertSelected(toInvert, size);
+		}
+		else cout << "Not initialized" << endl;
+
+	}
 };
 
 int main()
 {
-	int button = 0;
-	while (button != 3) {
-		Interface<>::Reference();
-		cin >> button;
-		cin.clear();
+	int button = 0, processed = 0;
+	DataInternal<float> *floatVar = nullptr;
+	DataInternal<short> *shortVar = nullptr;
+
+	while (button != 4) {
+		Interface::Help();
+		button = Interface::InputNumber<int>();
+		
+		if (button == 1) Interface::InputUnion(&floatVar, &shortVar, &processed);
+		else if (button == 2) Interface::OutputUnion(&floatVar, &shortVar, &processed);
+		else if (button == 3) Interface::Invert(&floatVar, &shortVar, &processed);
+
+		cout << "Press enter to continue ";
+		for (; cin.get() != '\n';);
 		system("cls");
 
-		if (button == 1) Interface<float>::GF();
-		else if (button == 2) Interface<short>::GF();
 	}
 
-	/*
-	DataInternal<float> *dat = new DataInternal<float>(-34535.2545633); // Для теста: ввести в <> имя типа, значение в конструктор
-	int toInvert;
-	int* invertedNumbers;
-
-	cout << dat->GetData() << " " << dat->GetBinary() << endl;
-
-	cin >> toInvert;
-	invertedNumbers = new int[toInvert];
-	for (int i = 0; i < toInvert; i++)
-		cin >> invertedNumbers[i];
-
-	dat->InvertSelected(invertedNumbers, toInvert);
-	cout << dat->GetData() << " " << dat->GetBinary() << endl;
-
-	delete dat;
-	*/
 	return 0;
 }
