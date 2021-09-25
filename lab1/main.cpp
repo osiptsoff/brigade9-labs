@@ -13,8 +13,6 @@ union DataInternal
 		DataInternal(T _data) : data(_data) {};
 		DataInternal() : data((T)0) {};
 		T GetData() { return data; }
-
-
 		void SetData(T _data) { data = _data;};
 
 		char* GetBinary(char* out = nullptr)
@@ -37,10 +35,14 @@ union DataInternal
 			return result;
 		}
 
-		void InvertSelected(int* selectedNumbers, int size)
+		void InvertUnselected(int* selectedNumbers, int size)
 		{
+			int tSize = sizeof(T);
+
 			for (int i = 0; i < size; ++i)
 				representation[selectedNumbers[i] / 8] ^= 1 << (selectedNumbers[i] % 8);
+			for (int i = 0; i < tSize; i++)
+				representation[i] = ~representation[i];
 		}
 };
 
@@ -60,15 +62,15 @@ public:
 	template <typename T = char>
 	static T InputNumber() {
 		T data;
-		bool flag = 0;
-		while (!flag) {
+		bool succsess = 0;
+		while (!succsess) {
 			cin >> data;
 			if (cin.get() != '\n') {
 				cin.clear();
 				for (; cin.get() != '\n';);
-				cout << "Enter correct number!" << endl;
+				cout << "Enter correct number! ";
 			}
-			else flag = 1;
+			else succsess = 1;
 		}
 		
 		return data;
@@ -77,82 +79,60 @@ public:
 	static void InputUnion(DataInternal<float>** floatVar, DataInternal<short>** shortVar, int* processed)
 	{
 		cout << "1 - For float input" << endl
-			<< "2 - For short input" << endl
-			<< "Enter your choice: ";
-		do 
+			<< "2 - For short input" << endl;
+		do {
+			cout << "Enter correct choice: ";
 			*processed = InputNumber<int>();
-		while (*processed != 1 && *processed != 2);
-		if (*processed == 1) {
+		}
+		 while (*processed != 1 && *processed != 2);
+
+		if (*processed == 1)
 			if (*floatVar)
 				(*floatVar)->SetData(InputNumber<float>());
 			else (*floatVar) = new DataInternal<float>(InputNumber<float>());
-		}
-		else {
+		else 
 			if (*shortVar)
 				(*shortVar)->SetData(InputNumber<short>());
 			else (*shortVar) = new DataInternal<short>(InputNumber<short>());
-		}
 		
 	}
 
-	static void OutputUnion(DataInternal<float>** floatVar, DataInternal<short>** shortVar, int* processed)
+	template <class T = DataInternal<>>
+	static void OutputUnion(T* var)
 	{
 		char* address = nullptr;
 
-		if (*processed == 1)
-		{
-			cout << "Representation: " << (*floatVar)->GetBinary(address) << endl
-			<< "Number: " << (*floatVar)->GetData() << endl;
-		}
-		else if (*processed == 2)
-		{
-			cout << "Representation: " << (*shortVar)->GetBinary(address) << endl
-			<< "Number: " << (*shortVar)->GetData() << endl;
-		}
+		if (var)
+			cout << "Representation: " << var->GetBinary(address) << endl << "Number: " << var->GetData() << endl;
 		else cout << "Not initialized" << endl;
 
 		delete address;
 	}
 
-	static void Invert(DataInternal<float>** floatVar, DataInternal<short>** shortVar, int* processed) {
-		int size;
+	template <class T = DataInternal<>>
+	static void Invert(T* var) {
 		int* toInvert;
+		int size;
+		int maxBit = sizeof(var->GetData()) * 8 - 1;
 
-		if (*processed == 1)
+		if (var)
 		{
-			cout << "How many to invert? " << endl;
+			cout << "How many to leave? " << endl;
 			size = InputNumber<int>();
 			toInvert = new int[size];
 			for (int i = 0; i < size; i++) {
 				int tmp;
 				do {
-					cout << "Enter the number of bit: ";
+					cout << "Enter the correct number of bit: ";
 					tmp = InputNumber<int>();
-				} while ((tmp > 31) || (tmp < 0));
+				} while ((tmp > maxBit) || (tmp < 0));
 				toInvert[i] = tmp;
 			}
 
-			(*floatVar)->InvertSelected(toInvert, size);
-		}
-		else if (*processed == 2)
-		{
-			cout << "How many to invert? ";
-
-			size = InputNumber<int>();
-			toInvert = new int[size];
-			for (int i = 0; i < size; i++) {
-				int tmp;
-				do {
-					cout << "Enter the number of bit: ";
-					tmp = InputNumber<int>();
-				} while ((tmp > 15) || (tmp < 0));
-				toInvert[i] = tmp;
-			}
-
-			(*shortVar)->InvertSelected(toInvert, size);
+			var->InvertUnselected(toInvert, size);
+			delete[] toInvert;
 		}
 		else cout << "Not initialized" << endl;
-
 	}
 };
 
@@ -167,8 +147,18 @@ int main()
 		button = Interface::InputNumber<int>();
 		
 		if (button == 1) Interface::InputUnion(&floatVar, &shortVar, &processed);
-		else if (button == 2) Interface::OutputUnion(&floatVar, &shortVar, &processed);
-		else if (button == 3) Interface::Invert(&floatVar, &shortVar, &processed);
+		else if (button == 2)
+			if (processed == 1)
+				Interface::OutputUnion<DataInternal<float>>(floatVar);
+			else
+				Interface::OutputUnion<DataInternal<short>>(shortVar);
+
+		else if (button == 3)
+			if (processed == 1)
+				Interface::Invert<DataInternal<float>>(floatVar);
+			else
+				Interface::Invert<DataInternal<short>>(shortVar);
+		else if (button != 4) cout << "Incorrect option." << endl;
 
 		cout << "Press enter to continue ";
 		for (; cin.get() != '\n';);
@@ -176,5 +166,7 @@ int main()
 
 	}
 
+	delete floatVar;
+	delete shortVar;
 	return 0;
 }
