@@ -126,6 +126,7 @@ public:
 					cout << "Enter the correct number of bit: ";
 					tmp = InputNumber<int>();
 				} while ((tmp > maxBit) || (tmp < 0));
+				cout << "Number saved succsessfully." << endl;
 				toInvert[i] = tmp;
 			}
 
