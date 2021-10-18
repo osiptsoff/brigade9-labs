@@ -94,7 +94,12 @@ public:
 			if (*shortVar)
 				(*shortVar)->SetData(InputNumber<short>());
 			else (*shortVar) = new DataInternal<short>(InputNumber<short>());
-		
+		cout << endl;
+		if (*processed == 1)
+			OutputUnion<DataInternal<float>>(*floatVar);
+		else
+			OutputUnion<DataInternal<short>>(*shortVar);
+		cout << endl;
 	}
 
 	template <class T = DataInternal<>>
@@ -112,12 +117,16 @@ public:
 	template <class T = DataInternal<>>
 	static void Invert(T* var) {
 		int* toInvert;
+		char* binOutput = nullptr;
 		int size;
 		int maxBit = sizeof(var->GetData()) * 8 - 1;
 
 		if (var)
 		{
-			cout << "How many to leave? " << endl;
+			cout << "\nBefore inversion " << endl;
+			cout << "Data: " << var->GetData() << "\nRepresentation: " << var->GetBinary(binOutput) << endl << endl;
+
+			cout << "How many bits to leave? " << endl;
 			size = InputNumber<int>();
 			toInvert = new int[size];
 			for (int i = 0; i < size; i++) {
@@ -131,6 +140,9 @@ public:
 			}
 
 			var->InvertUnselected(toInvert, size);
+			cout << "After inversion: " << endl;
+			cout << "Data: " << var->GetData() << "\nRepresentation: " << var->GetBinary(binOutput) << endl << endl;
+			delete[] binOutput;
 			delete[] toInvert;
 		}
 		else cout << "Not initialized" << endl;
