@@ -86,6 +86,7 @@ public:
 		}
 		 while (*processed != 1 && *processed != 2);
 
+		cout << "Enter your number: ";
 		if (*processed == 1)
 			if (*floatVar)
 				(*floatVar)->SetData(InputNumber<float>());
