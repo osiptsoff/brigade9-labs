@@ -1,6 +1,11 @@
 #include <conio.h>
 #include <dos.h>
 
+void scrool(int step) {
+	for (int i = wherey() - 1; i < step + 1; i++) insline();
+	gotoxy(1, wherey());
+}
+
 int main()
 {
 	const int upLeftX = 10;
@@ -9,7 +14,7 @@ int main()
 	const int downRightY = 20;
 	const int stringStep = 3;
 	const int maxPhraseLen = 26;
-	const float timeStep = 1.4;
+	const float timeStep = 1.3;
 	const char* colNames[] = { "BLACK", "BLUE", "GREEN", "CYAN", "RED", "MAGENTA", "BROWN", "LIGHTGRAY", "DARKGRAY", "LIGHTBLUE", "LIGHTGREEN", "LIGHTCYAN", "LIGHTRED", "LIGHTMAGENTA", "YELLOW", "WHITE" };
 
 	char* phrase = (char*)&maxPhraseLen;
@@ -32,9 +37,13 @@ int main()
 			textcolor(BLACK);
 			textbackground(LIGHTGRAY);
 			cprintf("    %s    %d", colNames[bgColor], txtColor);
+			delay((int)(1000 * timeStep));
+			gotoxy(1, wherey());
+
+			scrool(stringStep);
 
 			gotoxy(1, wherey() - stringStep);
-			delay((int)(1000 * timeStep));
+			//delay((int)(1000 * timeStep));
 		}
 
 	return 0;
