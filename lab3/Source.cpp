@@ -1,4 +1,4 @@
-#include <dos.h>
+#include <conio.h>
 #include <graphics.h>
 #include <math.h>
 #include <string.h>
@@ -34,16 +34,38 @@ void Axes(int distanceX, int distanceY) {
 	s[1] = '0';
 	outtextxy(distanceX - 20, getmaxy() / 2 + 15, s);
 }
-/*
-void Plot(some args and max){
-	setcolor(4); //changes to red
-	//FIX ME
+
+void Plot(int start, int finish, double& max) {
+	setcolor(4);
+
+	double k = double(start) / (M_PI / 2);
+	double valueX = start / k;
+	double valueY = pow(sin(valueX), 2) + pow(cos(valueX), 3);
+	int positionY = valueY * k;
+	moveto(start * 2, getmaxy() / 2 - positionY);
+
+	for (int i = start + 1; i <= finish; i++) {
+		if (valueY > max) {
+			max = valueY;
+		}
+
+		valueX = i / k;
+		valueY = pow(sin(valueX), 2) + pow(cos(valueX), 3);
+		positionY = valueY * k;
+		lineto(i + start, getmaxy() / 2 - positionY);
+	}
+
+	if (valueY > max) {
+		max = valueY;
+	}
+
+	setcolor(15);
 }
-*/
-void Print(int x, int y, int max) {
+
+void Print(int x, int y, double max) {
 	moveto(x, y);
 	char s[] = "y = sin^2(x) + cos^3(x), x: (pi/2; 5pi). Max y =  ";
-	s[strlen(s) - 1] = '0' + max;
+	s[strlen(s) - 1] = '0' + int(max + 0.5);
 	outtext(s);
 }
 
@@ -62,16 +84,16 @@ int main()
 		return 255;
 
 	const int halfPi = getmaxx() / 12;
-	const int one = halfPi / (3.14 / 2);
+	const int one = halfPi / (M_PI / 2);
 
 	Axes(halfPi, one);
 
-	int max = 0;
-	//void Plot(some args and max);
+	double max = -1000000;
+	Plot(halfPi, (halfPi * 2) * 5, max);
 
-	Print(halfPi + 15, one + 15, max);
+	Print(halfPi * 2, getmaxy() / 2 - one - 30, max);
 
-	delay(5000);
+	getch();
 	closegraph();
 	return 0;
 }
