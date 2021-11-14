@@ -73,7 +73,6 @@ void Print(int x, int y, double max) {
 int main()
 {
 	int driver, mode, errorCode;
-	char path[] = "C:\\TURBOC3\\BGI";
 
 	driver = DETECT;
 	detectgraph(&driver, &mode);
