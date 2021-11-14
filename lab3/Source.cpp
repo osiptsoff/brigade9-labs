@@ -23,16 +23,21 @@ void Axes(int distanceX, int distanceY) {
 	}
 
 	line(distanceX - 3, getmaxy() / 2 + distanceY, distanceX + 3, getmaxy() / 2 + distanceY);
+	line(distanceX - 3, getmaxy() / 2 + distanceY / 2, distanceX + 3, getmaxy() / 2 + distanceY / 2);
+	line(distanceX - 3, getmaxy() / 2 - distanceY / 2, distanceX + 3, getmaxy() / 2 - distanceY / 2);
 	line(distanceX - 3, getmaxy() / 2 - distanceY, distanceX + 3, getmaxy() / 2 - distanceY);
 
-	char s[] = "-1";
-	outtextxy(distanceX - 20, getmaxy() / 2 + distanceY, s);
+	char s[5] = "-1";
+	outtextxy(distanceX - 35, getmaxy() / 2 + distanceY, s);
 
-	s[0] = ' ';
-	outtextxy(distanceX - 20, getmaxy() / 2 - distanceY, s);
+	strcpy(s, "-0.5");
+	outtextxy(distanceX - 35, getmaxy() / 2 + distanceY / 2, s);
 
-	s[1] = '0';
-	outtextxy(distanceX - 20, getmaxy() / 2 + 15, s);
+	strcpy(s, "0.5");
+	outtextxy(distanceX - 27, getmaxy() / 2 - distanceY / 2, s);
+
+	strcpy(s, "1");
+	outtextxy(distanceX - 27, getmaxy() / 2 - distanceY, s);
 }
 
 void Plot(int start, int finish, double& max) {
@@ -72,10 +77,7 @@ void Print(int x, int y, double max) {
 
 int main()
 {
-	int driver, mode, errorCode;
-
-	driver = DETECT;
-	detectgraph(&driver, &mode);
+	int driver = DETECT, mode, errorCode;
 
 	initgraph(&driver, &mode, "C:\\TURBOC3\\BGI");
 	errorCode = graphresult();
