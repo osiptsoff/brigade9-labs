@@ -39,12 +39,12 @@ void Plot(int start, int finish, double& max) {
 	setcolor(4);
 
 	double k = double(start) / (M_PI / 2);
-	double valueX = start * 2 / k;
+	double valueX = start / k;
 	double valueY = pow(sin(valueX), 2) + pow(cos(valueX), 3);
 	int positionY = valueY * k;
 	moveto(start * 2, getmaxy() / 2 - positionY);
 
-	for (int i = start * 2 + 1; i <= finish + start; i++) {
+	for (int i = start + 1; i <= finish; i++) {
 		if (valueY > max) {
 			max = valueY;
 		}
@@ -52,7 +52,7 @@ void Plot(int start, int finish, double& max) {
 		valueX = i / k;
 		valueY = pow(sin(valueX), 2) + pow(cos(valueX), 3);
 		positionY = valueY * k;
-		lineto(i, getmaxy() / 2 - positionY);
+		lineto(i + start, getmaxy() / 2 - positionY);
 	}
 
 	if (valueY > max) {
