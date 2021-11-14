@@ -1,4 +1,4 @@
-#include <dos.h>
+#include <conio.h>
 #include <graphics.h>
 #include <math.h>
 #include <string.h>
@@ -38,11 +38,11 @@ void Axes(int distanceX, int distanceY) {
 void Plot(int start, int finish, double& max) {
 	setcolor(4);
 
-	double k = double(start) / (3.14 / 2);
+	double k = double(start) / (M_PI / 2);
 	double valueX = start * 2 / k;
 	double valueY = pow(sin(valueX), 2) + pow(cos(valueX), 3);
 	int positionY = valueY * k;
-	moveto(start * 2, getmaxy() / 2 + positionY);
+	moveto(start * 2, getmaxy() / 2 - positionY);
 
 	for (int i = start * 2 + 1; i <= finish + start; i++) {
 		if (valueY > max) {
@@ -52,7 +52,7 @@ void Plot(int start, int finish, double& max) {
 		valueX = i / k;
 		valueY = pow(sin(valueX), 2) + pow(cos(valueX), 3);
 		positionY = valueY * k;
-		lineto(i, getmaxy() / 2 + positionY);
+		lineto(i, getmaxy() / 2 - positionY);
 	}
 
 	if (valueY > max) {
@@ -84,7 +84,7 @@ int main()
 		return 255;
 
 	const int halfPi = getmaxx() / 12;
-	const int one = halfPi / (3.14 / 2);
+	const int one = halfPi / (M_PI / 2);
 
 	Axes(halfPi, one);
 
@@ -93,7 +93,7 @@ int main()
 
 	Print(halfPi * 2, getmaxy() / 2 - one - 30, max);
 
-	delay(5000);
+	getch();
 	closegraph();
 	return 0;
 }
