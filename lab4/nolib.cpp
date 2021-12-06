@@ -1,7 +1,6 @@
 #include "dos.h"
 #include "conio.h"
 
-
 int keypressed()
 {
 	union REGS reg;
@@ -26,42 +25,28 @@ int main()
 	const downY = 20;
 
 	window(leftX, upY, rightX, downY);
+	textattr(0x70);
 	clrscr();
 
-	int x = 1, y = 1, symbol = 0;
+	int x = 1, y = (downY - upY) / 2, symbol = 0;
 	int left = 0;
 
 	do
 	{
 		clrscr();
 		if (left == 1)
-			if (x < 2) {
-				if (y > 1) {
-					x = rightX - leftX;
-					y -= 1;
-				}
-			}
-			else
-				x -= 1;
-
+			x = (x < 2) ? rightX - leftX : x - 1;
 		if (left == 0)
-			if (x > rightX - leftX) {
-				if (y < downY - upY) {
-					x = 1;
-					y += 1;
-				}
-			}
-			else
-				x += 1;
+			x = (x > rightX - leftX) ? 1 : x + 1;
 
 		gotoxy(x, y);
 		putch('*');
 		delay(100);
 
-		if (kbhit())
+		if (keypressed())
 			do
 				symbol = symbol_code();
-		while (keypressed());
+			while (keypressed());
 
 		switch (symbol)
 		{
