@@ -3,23 +3,35 @@
 
 void interrupt(*oldInt)(...);
 
+const leftX = 10;
+const upY = 10;
+const rightX = 70;
+const downY = 20;
+
+int keyCode = 0;
+
 void interrupt myInt(...) {
-	union REGS reg;
-	reg.h.ah = 0;
 
-	oldInt();   //call the old interruption handler to read key and save it's code
-
-	switch (int86(0x16, &reg, &reg)) {    //call another interruption to check saved keycode
-	case 0x3B00: //F1 (two-byte code everywhere)
+	keyCode = inportb(0x60); //check key
+	switch (keyCode) {
+	case 59: //F1 down
 		putch('A');
 		break;
-	case 0x3C00: //F2
-		putch(0xE08);  //backspace
-		putch(' ');
-		putch(0xE08);  //backspace	
+	case 60: //F2 down
+		if (wherex() != 1) {
+			putch('\b');
+			putch(' ');
+			putch('\b');
+		}
+		else if (wherey() != 1) {
+			gotoxy(rightX - leftX + 1, wherey() - 1);
+			putch(' ');
+			gotoxy(rightX - leftX + 1, wherey() - 1);
+		}
+
 	}
 
-
+	oldInt();   //call the old interruption handler
 }
 
 
@@ -28,7 +40,11 @@ int main()
 	oldInt = getvect(0x09); //save the address of original keyboard interruption handler
 	setvect(0x09, myInt);   //assign our function to keyboard interruption handler
 
-	while (1);
+	window(leftX, upY, rightX, downY);
+	textattr(0x70);
+	clrscr();
+
+	while (keyCode != 1); // while ESC is not pressed
 
 	return 0;
 }
